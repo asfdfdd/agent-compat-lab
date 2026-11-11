@@ -17,7 +17,7 @@ jobs:
           EOF
           base64 -d /tmp/project.b64 > /tmp/project.tar.gz
           tar -xzf /tmp/project.tar.gz -C .
-          rm -f .github/workflows/bootstrap.yml
+          rm -f .github/workflows/ci.yml
       - name: Commit project
         shell: bash
         run: |
@@ -26,4 +26,5 @@ jobs:
           git add -A
           git commit -m "Bootstrap Agent Compat Lab"
           git push
+
 
