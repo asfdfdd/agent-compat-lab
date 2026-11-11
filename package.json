@@ -1,7 +1,7 @@
 {
   "name": "agent-compat-lab",
   "version": "0.2.0",
-  "description": "Evidence-backed compatibility checks for coding-agent configuration surfaces.",
+  "description": "Evidence-backed compatibility and conformance checks for coding-agent configuration surfaces.",
   "type": "module",
   "bin": {
     "agent-compat": "src/cli.js"
@@ -30,6 +30,10 @@
     "claude-code",
     "github-copilot",
     "opencode",
+    "agent-skills",
+    "mcp",
+    "agents-md",
+    "ai-agents",
     "compatibility",
     "conformance",
     "developer-tools"
@@ -44,3 +48,4 @@
   },
   "homepage": "https://github.com/asfdfdd/agent-compat-lab#readme"
 }
+
