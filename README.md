@@ -1,39 +1,64 @@
 # Agent Compat Lab
 
+[![CI](https://github.com/asfdfdd/agent-compat-lab/actions/workflows/ci.yml/badge.svg)](https://github.com/asfdfdd/agent-compat-lab/actions/workflows/ci.yml)
+[![GitHub release](https://img.shields.io/github/v/release/asfdfdd/agent-compat-lab)](https://github.com/asfdfdd/agent-compat-lab/releases)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+
 Evidence-backed compatibility checks for coding-agent configuration surfaces.
 
-Coding agents increasingly share concepts such as repository instructions and Agent Skills, but the file locations and supported surfaces still differ. Static compatibility tables drift quickly. Agent Compat Lab keeps every compatibility claim next to a primary-source citation and pairs the registry with local probes that can verify what is installed and what configuration markers are present in a repository.
+Coding agents increasingly share the same concepts while disagreeing on the details. Repository instructions, Agent Skills, MCP servers, hooks, plugins, commands, and custom tools can live at different paths or use different configuration models depending on the agent. Static comparison tables drift quickly and often blur the difference between documented support and assumption.
 
-The project is intentionally vendor-neutral and has no model or cloud dependency.
+Agent Compat Lab keeps compatibility claims next to primary-source evidence and pairs that registry with safe local probes. The goal is simple: make coding-agent interoperability inspectable, reproducible, and easier to maintain as the ecosystem changes.
 
-## What works in v0.1
-
-- Registry entries for OpenAI Codex CLI, Claude Code, Gemini CLI, Cursor, and GitHub Copilot CLI.
-- Primary-source evidence for every claimed capability.
-- `list`, `show`, and `compare` commands for inspecting the matrix.
-- `probe` / `doctor` commands that detect installed CLIs, report their local version output, and scan the current repository for relevant configuration markers.
-- JSON output for CI, scripts, and downstream tooling.
-- Registry validation that rejects unsupported status values and claims without primary evidence.
-
-## Quick start
+## 30 second tour
 
 Requires Node.js 20 or newer.
 
 ```bash
+git clone https://github.com/asfdfdd/agent-compat-lab.git
+cd agent-compat-lab
 npm install
-node src/cli.js list
-node src/cli.js compare codex claude-code
-node src/cli.js doctor
-node src/cli.js doctor --json
+
+node src/cli.js matrix
+node src/cli.js compare codex opencode
+node src/cli.js evidence codex
+node src/cli.js doctor --cwd ..
 ```
 
-After publication to npm:
+Every command also supports JSON where it is useful for automation:
 
 ```bash
-npx agent-compat-lab doctor
+node src/cli.js matrix --json
+node src/cli.js doctor --cwd /path/to/repository --json
 ```
 
-## Example
+## Supported agents
+
+| Agent | Repository instructions | Project skills | MCP config | Hooks | Plugins | Commands | Custom tools |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| OpenAI Codex CLI | Yes | Yes | Yes | Unknown | Yes | Unknown | Unknown |
+| Claude Code | Yes | Yes | Unknown | Yes | Unknown | Unknown | Unknown |
+| Gemini CLI | Yes | Yes | Yes | Yes | Yes | Unknown | Unknown |
+| Cursor | Yes | Yes | Yes | Yes | Yes | Unknown | Unknown |
+| GitHub Copilot CLI | Yes | Yes | Yes | Yes | Unknown | Unknown | Unknown |
+| OpenCode | Yes | Yes | Yes | Unknown | Yes | Yes | Yes |
+
+`Unknown` is deliberate. Missing evidence is not converted into an `unsupported` claim.
+
+## What v0.2 adds
+
+* Six evidence-backed agent adapters, including OpenCode.
+* A full `matrix` command for side-by-side compatibility inspection.
+* An `evidence` command for auditing every source behind a compatibility claim.
+* `--cwd <path>` support for probing any repository without changing directories.
+* Safe install/version detection and repository-marker scanning.
+* JSON output for CI, scripts, and downstream tooling.
+* Registry validation that rejects unsupported statuses and claims without primary evidence.
+* Cross-platform tests on Windows, macOS, and Ubuntu across Node 20, 22, and 24.
+
+## Examples
+
+Compare two agents:
 
 ```text
 $ agent-compat compare codex github-copilot
@@ -42,25 +67,78 @@ CAPABILITY               CODEX      GITHUB-COPILOT
 -----------------------  ---------  --------------
 hooks                    unknown    supported
 instructions.repository  supported  supported
+mcp.config               supported  supported
+plugins                  supported  unknown
 skills.project           supported  supported
 ```
 
-`unknown` is deliberate. The registry does not turn a missing citation into a negative claim.
+Audit evidence:
+
+```text
+$ agent-compat evidence opencode
+AGENT     CAPABILITY               STATUS     CHECKED     SOURCE
+--------  -----------------------  ---------  ----------  ----------------------------------------
+opencode  instructions.repository  supported  2026-11-11  https://opencode.ai/docs/instructions/
+opencode  skills.project           supported  2026-11-11  https://opencode.ai/docs/skills/
+...
+```
+
+Probe another repository:
+
+```bash
+agent-compat doctor --cwd ../my-project --json
+```
+
+The probe does not start an agent, invoke a model, execute hooks, start MCP servers, install plugins, or trigger login.
+
+## Why this project exists
+
+The coding-agent ecosystem is converging on shared concepts faster than it is converging on shared configuration. Developers should not have to rely on stale blog posts or memory to answer questions such as:
+
+* Which instruction files will this agent discover?
+* Can the same Agent Skill work across multiple tools?
+* Where does this agent expect MCP configuration?
+* Does a repository already contain configuration markers for an agent?
+* Which claims are documented, and when were those sources last checked?
+
+Agent Compat Lab treats those as conformance questions rather than marketing claims.
 
 ## Evidence policy
 
-Compatibility entries must cite vendor documentation or another primary source. A blog post, generated answer, or copied compatibility table is not enough. See [docs/EVIDENCE_POLICY.md](docs/EVIDENCE_POLICY.md).
+Every `supported`, `partial`, or `unsupported` capability claim requires a primary source. A generated answer, copied matrix, social post, or third-party blog is not enough.
+
+See [Evidence Policy](docs/EVIDENCE_POLICY.md) and [Conformance Model](docs/CONFORMANCE_MODEL.md).
 
 ## Contributing
 
-The highest-value contributions add a new agent, prove a capability change, or add an executable probe. Gemini CLI, Cursor, OpenCode, Windsurf, Cline, and platform-specific probes are intentionally open contribution areas.
+The highest-value contributions add evidence, executable probes, new agents, or regression fixtures. Good contribution areas include:
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) and [docs/ADDING_AN_AGENT.md](docs/ADDING_AN_AGENT.md).
+* Windsurf and Cline adapters.
+* Version-scoped evidence and deprecation metadata.
+* MCP configuration fixtures.
+* Platform-specific detection behavior.
+* Historical compatibility diffs.
+* Schema stabilization for third-party adapters.
+* Reproducible tests for instruction precedence and discovery.
 
-## Scope
+See [CONTRIBUTING.md](CONTRIBUTING.md), [Adding an Agent](docs/ADDING_AN_AGENT.md), and [Architecture](docs/ARCHITECTURE.md).
 
-Agent Compat Lab reports documented configuration compatibility and observable local state. It does not claim that an installed agent will follow instructions correctly, that two agents interpret the same instructions identically, or that a cloud feature is available to a particular account. Default probes never start an MCP server, execute a hook, invoke a model, install a plugin, or trigger login.
+## Design boundaries
+
+Agent Compat Lab reports documented configuration compatibility and observable local state. It does not claim that an installed agent will follow instructions correctly, that two agents interpret the same instructions identically, or that a cloud feature is available to a particular account.
+
+Default probes are non-destructive and do not read authentication tokens, API keys, private prompts, session transcripts, or unrelated user files.
+
+## Development
+
+```bash
+npm install
+npm run check
+npm run pack:dry
+```
+
+The package has zero runtime dependencies in v0.2.
 
 ## License
 
-MIT. This project is independent and is not affiliated with or endorsed by OpenAI, Anthropic, GitHub, or other vendors represented in the registry.
+MIT. Agent Compat Lab is independent and is not affiliated with or endorsed by OpenAI, Anthropic, Google, Cursor, GitHub, Anomaly, or other vendors represented in the registry.

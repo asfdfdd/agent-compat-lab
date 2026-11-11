@@ -257,6 +257,80 @@ export const agents = [
       },
     },
   },
+  {
+    id: "opencode",
+    name: "OpenCode",
+    vendor: "Anomaly",
+    homepage: "https://opencode.ai/",
+    commands: [
+      { executable: "opencode", versionArgs: ["--version"], label: "opencode" },
+    ],
+    repoMarkers: [
+      "AGENTS.md",
+      "opencode.json",
+      "opencode.jsonc",
+      ".opencode/skills",
+      ".agents/skills",
+      ".claude/skills",
+      ".opencode/commands",
+      ".opencode/plugins",
+      ".opencode/tools",
+    ],
+    capabilities: {
+      "instructions.repository": {
+        status: "supported",
+        paths: ["AGENTS.md", "opencode.json", "opencode.jsonc"],
+        evidence: primary(
+          "https://opencode.ai/docs/instructions/",
+          "OpenCode documents AGENTS.md and repository instructions."
+        ),
+      },
+      "skills.project": {
+        status: "supported",
+        paths: [
+          ".opencode/skills/<skill>/SKILL.md",
+          ".agents/skills/<skill>/SKILL.md",
+          ".claude/skills/<skill>/SKILL.md",
+        ],
+        evidence: primary(
+          "https://opencode.ai/docs/skills/",
+          "OpenCode documents native project skills and compatibility skill locations."
+        ),
+      },
+      "mcp.config": {
+        status: "supported",
+        paths: ["opencode.json", "opencode.jsonc"],
+        evidence: primary(
+          "https://opencode.ai/docs/mcp-servers/",
+          "OpenCode documents MCP servers in project configuration."
+        ),
+      },
+      "plugins": {
+        status: "supported",
+        paths: [".opencode/plugins/*.ts", ".opencode/plugins/*.js", "opencode.json", "opencode.jsonc"],
+        evidence: primary(
+          "https://opencode.ai/docs/plugins/",
+          "OpenCode documents project plugins and configured plugin packages."
+        ),
+      },
+      "commands": {
+        status: "supported",
+        paths: [".opencode/commands/**/*.md"],
+        evidence: primary(
+          "https://opencode.ai/docs/commands/",
+          "OpenCode documents repository custom commands."
+        ),
+      },
+      "custom-tools": {
+        status: "supported",
+        paths: [".opencode/tools/*.ts", ".opencode/tools/*.js"],
+        evidence: primary(
+          "https://opencode.ai/docs/custom-tools/",
+          "OpenCode documents local custom tools in .opencode/tools."
+        ),
+      },
+    },
+  },
 ];
 
 export function getAgent(id) {

@@ -19,3 +19,8 @@ test("probe detects an installed executable and repo markers", () => {
   assert.equal(result.presentMarkerCount, 1);
   assert.match(result.command.version.output, /^v\d+/);
 });
+
+test("probe rejects a missing repository path", () => {
+  const fake = { id: "fake", name: "Fake", commands: [], repoMarkers: [] };
+  assert.throws(() => probeAgent(fake, join(tmpdir(), "agent-compat-path-that-does-not-exist")), /does not exist/);
+});

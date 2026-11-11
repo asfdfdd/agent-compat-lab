@@ -30,3 +30,5 @@ Every `supported`, `partial`, or `unsupported` capability claim needs a primary-
 ## Pull requests
 
 Keep each PR focused on one agent, capability, probe, or infrastructure improvement. Explain what changed, link the primary evidence, and include the command used to validate it.
+
+For architecture and maintainer expectations, see [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md), [docs/CONFORMANCE_MODEL.md](docs/CONFORMANCE_MODEL.md), and [docs/MAINTAINER_WORKFLOW.md](docs/MAINTAINER_WORKFLOW.md).

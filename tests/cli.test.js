@@ -20,3 +20,27 @@ test("registry command exits cleanly", () => {
   assert.equal(result.status, 0);
   assert.equal(JSON.parse(result.stdout).ok, true);
 });
+
+test("matrix --json includes capability status for every agent", () => {
+  const result = spawnSync(process.execPath, [cli, "matrix", "--json"], { encoding: "utf8" });
+  assert.equal(result.status, 0);
+  const parsed = JSON.parse(result.stdout);
+  assert.ok(parsed.agents.length >= 6);
+  const instructions = parsed.capabilities.find((row) => row.capability === "instructions.repository");
+  assert.equal(instructions.agents.codex, "supported");
+});
+
+test("evidence --json exposes traceable primary sources", () => {
+  const result = spawnSync(process.execPath, [cli, "evidence", "codex", "--json"], { encoding: "utf8" });
+  assert.equal(result.status, 0);
+  const parsed = JSON.parse(result.stdout);
+  assert.ok(parsed.evidence.length > 0);
+  assert.ok(parsed.evidence.every((entry) => entry.source === "primary"));
+});
+
+test("doctor accepts an explicit repository path", () => {
+  const result = spawnSync(process.execPath, [cli, "doctor", "--cwd", here, "--json"], { encoding: "utf8" });
+  assert.equal(result.status, 0);
+  const parsed = JSON.parse(result.stdout);
+  assert.ok(parsed.results.every((entry) => entry.cwd === here));
+});

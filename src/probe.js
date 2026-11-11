@@ -27,6 +27,11 @@ function runVersion(candidate) {
 }
 
 export function probeAgent(agent, cwd = process.cwd()) {
+  const root = resolve(cwd);
+  if (!existsSync(root)) {
+    throw new Error(`repository path does not exist: ${root}`);
+  }
+
   let installed = null;
   for (const candidate of agent.commands ?? []) {
     if (!commandExists(candidate.executable)) continue;
@@ -41,13 +46,13 @@ export function probeAgent(agent, cwd = process.cwd()) {
 
   const markers = (agent.repoMarkers ?? []).map((marker) => ({
     path: marker,
-    present: existsSync(resolve(cwd, marker)),
+    present: existsSync(resolve(root, marker)),
   }));
 
   return {
     agent: agent.id,
     name: agent.name,
-    cwd: resolve(cwd),
+    cwd: root,
     installed: Boolean(installed),
     command: installed,
     repositoryMarkers: markers,

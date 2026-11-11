@@ -3,11 +3,13 @@
 ## v0.2
 
 - OpenCode adapter.
-- Capability-level executable probes and fixture projects.
+- Full cross-agent matrix output.
+- Evidence audit command.
 - `--cwd` support for probing another repository.
 
 ## v0.3
 
+- Capability-level executable probes and fixture projects.
 - MCP configuration compatibility.
 - Custom-agent/subagent definitions.
 - Hook lifecycle comparison.

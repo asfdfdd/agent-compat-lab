@@ -2,6 +2,8 @@
 import { agents, getAgent, REGISTRY_VERSION, CHECKED_AT } from "./registry.js";
 import { compareAgents } from "./compare.js";
 import { probeAgent } from "./probe.js";
+import { buildMatrix } from "./matrix.js";
+import { listEvidence } from "./evidence.js";
 import { validateRegistry } from "./validate.js";
 import { table } from "./format.js";
 
@@ -12,8 +14,10 @@ Usage:
   agent-compat list [--json]
   agent-compat show <agent> [--json]
   agent-compat compare <agent-a> <agent-b> [--json]
-  agent-compat probe [agent|all] [--json]
-  agent-compat doctor [--json]
+  agent-compat matrix [--json]
+  agent-compat evidence [agent] [--json]
+  agent-compat probe [agent|all] [--cwd <path>] [--json]
+  agent-compat doctor [--cwd <path>] [--json]
   agent-compat registry [--json]
 
 Agents: ${agents.map((agent) => agent.id).join(", ")}`;
@@ -59,10 +63,10 @@ function compare(left, right, json) {
   ));
 }
 
-function probe(target, json) {
+function probe(target, cwd, json) {
   const selected = !target || target === "all" ? agents : [getAgent(target)].filter(Boolean);
   if (selected.length === 0) throw new Error(`unknown agent: ${target}`);
-  const results = selected.map((agent) => probeAgent(agent));
+  const results = selected.map((agent) => probeAgent(agent, cwd));
   if (json) return emit({ checkedAt: new Date().toISOString(), results }, true);
   console.log(table(
     ["AGENT", "INSTALLED", "COMMAND", "REPO MARKERS"],
@@ -72,6 +76,27 @@ function probe(target, json) {
       result.command?.version?.output ?? result.command?.command ?? "-",
       `${result.presentMarkerCount}/${result.repositoryMarkers.length}`,
     ])
+  ));
+}
+
+function matrix(json) {
+  const result = buildMatrix();
+  if (json) return emit(result, true);
+  console.log(table(
+    ["CAPABILITY", ...result.agents.map((agent) => agent.id.toUpperCase())],
+    result.capabilities.map((row) => [
+      row.capability,
+      ...result.agents.map((agent) => row.agents[agent.id]),
+    ])
+  ));
+}
+
+function evidence(agentId, json) {
+  const rows = listEvidence(agentId);
+  if (json) return emit({ evidence: rows }, true);
+  console.log(table(
+    ["AGENT", "CAPABILITY", "STATUS", "CHECKED", "SOURCE"],
+    rows.map((row) => [row.agent, row.capability, row.status, row.checkedAt, row.url])
   ));
 }
 
@@ -85,7 +110,17 @@ function registry(json) {
 
 const args = process.argv.slice(2);
 const json = args.includes("--json");
-const positional = args.filter((arg) => arg !== "--json");
+const cwdIndex = args.indexOf("--cwd");
+if (cwdIndex !== -1 && !args[cwdIndex + 1]) {
+  console.error("agent-compat: --cwd requires a path");
+  process.exit(2);
+}
+const cwd = cwdIndex === -1 ? process.cwd() : args[cwdIndex + 1];
+const positional = args.filter((arg, index) =>
+  arg !== "--json" &&
+  arg !== "--cwd" &&
+  !(cwdIndex !== -1 && index === cwdIndex + 1)
+);
 const [command = "help", ...rest] = positional;
 
 try {
@@ -93,8 +128,10 @@ try {
     case "list": list(json); break;
     case "show": show(rest[0], json); break;
     case "compare": compare(rest[0], rest[1], json); break;
-    case "probe": probe(rest[0] ?? "all", json); break;
-    case "doctor": probe("all", json); break;
+    case "matrix": matrix(json); break;
+    case "evidence": evidence(rest[0] ?? null, json); break;
+    case "probe": probe(rest[0] ?? "all", cwd, json); break;
+    case "doctor": probe("all", cwd, json); break;
     case "registry": registry(json); break;
     case "help":
     case "--help":

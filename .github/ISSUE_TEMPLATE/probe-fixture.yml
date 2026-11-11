@@ -1,0 +1,31 @@
+name: Add a probe or fixture
+description: Propose a deterministic compatibility probe or regression fixture.
+title: "probe: "
+labels: ["probe"]
+body:
+  - type: input
+    id: agent
+    attributes:
+      label: Agent or capability
+      placeholder: Codex instruction precedence
+    validations:
+      required: true
+  - type: textarea
+    id: behavior
+    attributes:
+      label: Behavior to establish
+      description: State the narrow fact the probe should observe.
+    validations:
+      required: true
+  - type: textarea
+    id: safe
+    attributes:
+      label: Safe reproduction
+      description: Explain how to reproduce the behavior without exposing credentials or mutating unrelated user state.
+    validations:
+      required: true
+  - type: input
+    id: evidence
+    attributes:
+      label: Primary documentation
+      description: Link the relevant vendor documentation when available.

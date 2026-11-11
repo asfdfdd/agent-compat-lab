@@ -1,6 +1,6 @@
 {
   "name": "agent-compat-lab",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Evidence-backed compatibility checks for coding-agent configuration surfaces.",
   "type": "module",
   "bin": {
@@ -29,6 +29,7 @@
     "codex",
     "claude-code",
     "github-copilot",
+    "opencode",
     "compatibility",
     "conformance",
     "developer-tools"
