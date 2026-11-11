@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://agent-compat-lab.dev/schemas/report.schema.json",
+  "title": "Agent Compat Lab Probe Report",
+  "type": "object",
+  "required": ["checkedAt", "results"],
+  "properties": {
+    "checkedAt": { "type": "string", "format": "date-time" },
+    "results": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["agent", "name", "cwd", "installed", "repositoryMarkers", "presentMarkerCount"],
+        "properties": {
+          "agent": { "type": "string" },
+          "name": { "type": "string" },
+          "cwd": { "type": "string" },
+          "installed": { "type": "boolean" },
+          "repositoryMarkers": { "type": "array" },
+          "presentMarkerCount": { "type": "integer", "minimum": 0 }
+        }
+      }
+    }
+  }
+}

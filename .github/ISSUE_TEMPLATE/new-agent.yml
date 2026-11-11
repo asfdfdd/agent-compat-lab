@@ -1,0 +1,26 @@
+name: Add an agent
+description: Propose a new coding-agent adapter and evidence set.
+title: "agent: "
+labels: ["new-agent"]
+body:
+  - type: input
+    id: agent
+    attributes:
+      label: Agent
+      placeholder: Gemini CLI
+    validations:
+      required: true
+  - type: input
+    id: docs
+    attributes:
+      label: Primary documentation
+      description: Link to official documentation for at least one compatibility surface.
+    validations:
+      required: true
+  - type: textarea
+    id: probe
+    attributes:
+      label: Safe local probe
+      description: How can the CLI detect this agent/version without authentication or private-data access?
+    validations:
+      required: true

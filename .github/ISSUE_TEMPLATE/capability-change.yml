@@ -1,0 +1,29 @@
+name: Capability changed
+description: Report a documented compatibility change for an existing agent.
+title: "capability: "
+labels: ["capability-change"]
+body:
+  - type: dropdown
+    id: agent
+    attributes:
+      label: Agent
+      options:
+        - codex
+        - claude-code
+        - gemini-cli
+        - cursor
+        - github-copilot
+    validations:
+      required: true
+  - type: input
+    id: docs
+    attributes:
+      label: Primary source
+    validations:
+      required: true
+  - type: textarea
+    id: change
+    attributes:
+      label: What changed?
+    validations:
+      required: true
