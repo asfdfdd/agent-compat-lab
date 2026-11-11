@@ -16,10 +16,48 @@
           "name": { "type": "string" },
           "cwd": { "type": "string" },
           "installed": { "type": "boolean" },
-          "repositoryMarkers": { "type": "array" },
+          "command": {
+            "anyOf": [
+              { "type": "null" },
+              {
+                "type": "object",
+                "required": ["command", "executable", "version"],
+                "additionalProperties": false,
+                "properties": {
+                  "command": { "type": "string" },
+                  "executable": { "type": "string" },
+                  "version": {
+                    "type": "object",
+                    "required": ["ok", "status", "output"],
+                    "additionalProperties": false,
+                    "properties": {
+                      "ok": { "type": "boolean" },
+                      "status": { "type": ["integer", "null"] },
+                      "output": { "type": ["string", "null"] }
+                    }
+                  }
+                }
+              }
+            ]
+          },
+          "repositoryMarkers": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["path", "present"],
+              "additionalProperties": false,
+              "properties": {
+                "path": { "type": "string", "minLength": 1 },
+                "present": { "type": "boolean" }
+              }
+            }
+          },
           "presentMarkerCount": { "type": "integer", "minimum": 0 }
-        }
+        },
+        "additionalProperties": false
       }
     }
-  }
+  },
+  "additionalProperties": false
 }
+
